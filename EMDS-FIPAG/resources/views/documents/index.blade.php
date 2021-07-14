@@ -131,7 +131,12 @@
                         @else
                         <i class="material-icons">folder_open</i>
                         @endif
-                        <h6>{{ $doc->name }}</h6>
+                        <h5>{{ $doc->cliente_name }}</h5>
+                        @foreach( $category as $cate)
+                        @if ($cate->id === $doc->category_id)
+                        <h6>{{ $cate->name  }}<h6>
+                       @endif
+                       @endforeach
                         <p>{{ $doc->filesize }}</p>
                       </div>
                     </a>
@@ -165,9 +170,13 @@
                       <td>
                         <label for="chk_{{ $doc->id }}"></label>
                       </td>
-                      <td>{{ $doc->name }}</td>
-                      <td>{{ $doc->user->name }}</td>
-                      <td>{{ $doc->user->department['dptName'] }}</td>
+                      @foreach( $category as $cate)
+                      @if ($cate->id === $doc->category_id)
+                      <td>{{ $cate->name  }}</td>
+                      @endif
+                      @endforeach
+                    
+                      
                       <td>{{ $doc->created_at->toDayDateTimeString() }}</td>
                       <td>
                         @if($doc->isExpire)
@@ -191,11 +200,11 @@
                         @endcan
                         {!! Form::close() !!}
                         <!-- SHARE using link -->
-                        {!! Form::open(['action' => ['ShareController@update', $doc->id], 'method' => 'PATCH', 'id' => 'form-share-documents-' . $doc->id]) !!}
                         @can('shared')
-                        <a href="" class="data-share tooltipped" data-position="left" data-delay="50" data-tooltip="Share" data-form="documents-{{ $doc->id }}"><i class="material-icons">share</i></a>
-                        @endcan
-                        {!! Form::close() !!}
+                        <a href="#" data-target="modal1" class="btn-circle purple waves-effect waves-light data-share tooltipped" data-position="top" data-delay="50" data-tooltip="Designar a um funcionario" >
+                          <i class="material-icons">share</i>
+                        </a>                       
+                         @endcan
                         {!! Form::open() !!}
                         @can('edit')
                         <a href="documents/{{ $doc->id }}/edit" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Edit"><i class="material-icons">mode_edit</i></a>
@@ -225,29 +234,6 @@
     </div>
   </div>
 </div>
-<!-- right click menu -->
-<div id="context-menu" class="context-menu">
-  <ul class="context-menu_items">
-    <li class="context-menu_item">
-      <a href="documents/open/15" class="context-menu_link" data-action="Open">
-        <i class="material-icons">open_with</i><p>Abrir</p>
-      </a>
-    </li>
-    <li class="context-menu_item">
-      <a href="#" class="context-menu_link" data-action="Share">
-        <i class="material-icons">share</i><p>Partilhar</p>
-      </a>
-    </li>
-    <li class="context-menu_item">
-      <a href="documents/15/edit" class="context-menu_link" data-action="Edit">
-        <i class="material-icons">edit</i><p>Editar</p>
-      </a>
-    </li>
-    <li class="context-menu_item">
-      <a href="#" class="context-menu_link" data-action="Delete">
-        <i class="material-icons">delete</i><p>Apagar</p>
-      </a>
-    </li>
-  </ul>
-</div>
+
 @endsection
+

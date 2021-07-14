@@ -14,7 +14,15 @@ class Document extends Model
         return $this->belongsTo('App\User');
     }
 
+    public function department(){
+        return $this->belongsTo('App\Department');
+    }
+    
+    public function cliente(){
+        return $this->belongsTo('App\Cliente');
+    }
+
     public function categories() {
-        return $this->belongsToMany('App\Category');
+        return $this->belongsTo('App\Category');
     }
 }

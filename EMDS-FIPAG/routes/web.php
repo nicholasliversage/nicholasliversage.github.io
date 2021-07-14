@@ -1,7 +1,9 @@
 <?php
 
 //use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\MailController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -29,7 +31,10 @@ Route::get('dashboard', function() {
   return view('/dashboard');
 })->middleware('auth');
 
-
+//clientes
+Route::get('/cliente', 'ClienteController@index');
+Route::resource('cliente','ClienteController');
+Route::get('/inc/mail','MailController@html_email');
 // users
 Route::resource('users','UsersController');
 // departments
@@ -44,6 +49,12 @@ Route::get('documents/open/{id}','DocumentsController@open');
 Route::get('mydocuments','DocumentsController@mydocuments');
 Route::get('/trash','DocumentsController@trash');
 Route::get('documents/restore/{id}','DocumentsController@restore');
+Route::post('documents/show/{id}','DocumentsController@assignToUser')->name('document.user');
+Route::post('documents/{id}','DocumentsController@assignToDepartment')->name('document.department');
+Route::get('documents/show/{id}','DocumentsController@removeUser')->name('document.devolver');
+Route::get('documents/show/{id}','DocumentsController@takeDocument')->name('document.take');
+
+
 Route::delete('documentsDeleteMulti','DocumentsController@deleteMulti');
 // search
 Route::post('/search','DocumentsController@search');

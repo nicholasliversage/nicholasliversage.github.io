@@ -17,7 +17,7 @@
             <thead>
               <tr>
                   <th>Nome do ficheiro</th>
-                  <th>Dono</th>
+                  <th>Cliente</th>
                   <th>Departmento</th>
                   <th>Data de upload</th>
                   <th>Accoes</th>
@@ -27,17 +27,25 @@
               @if(count($shared) > 0)
                 @foreach($shared as $share)
                 <tr>
-                  <td>{{ $share->name }}</td>
-                  <td>{{ $share->user->name }}</td>
-                  <td>{{ $share->user->department['dptName'] }}</td>
+                  @foreach ($cat as $c )
+                  @if ($c->id == $share->category_id)
+                  <td>{{ $c->name}}</td> 
+                  @endif
+                  @endforeach
+                  <td>{{ $share->cliente_name }}</td>
+                  @foreach ($dept as $dep)
+                  @if ($dep->id == $share->depart_id)
+                  <td>{{ $dep->dptName }}</td> 
+                  @endif
+                  @endforeach
                   <td>{{ $share->created_at->toDayDateTimeString() }}</td>
                   <td>
                     <p>
-                      <a href="documents/open/{{ $share->document_id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Open"><i class="material-icons">open_with</i></a>
+                      <a href="documents/{{ $share->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Abrir"><i class="material-icons">open_with</i></a>
                     </p>
                     <br>
                     <p>
-                      <a href="documents/download/{{ $share->document_id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Download"><i class="material-icons">file_download</i></a>
+                      <a href="documents/download/{{ $share->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Baixar"><i class="material-icons">file_download</i></a>
                     </p>
                   </td>
                 </tr>

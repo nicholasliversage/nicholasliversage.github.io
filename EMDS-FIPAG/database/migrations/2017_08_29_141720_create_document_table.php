@@ -15,13 +15,14 @@ class CreateDocumentTable extends Migration
     {
         Schema::create('document', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
             $table->string('description');
-            $table->integer('user_id');
-            $table->integer('department_id');
-            $table->string('file');
-            $table->string('filesize');
-            $table->string('mimetype');
+            $table->integer('category_id');
+            $table->integer('depart_id')->nullable();
+            $table->integer('user_id')->nullable();
+            $table->string('cliente_name');
+            $table->string('file')->nullable();
+            $table->string('filesize')->nullable();
+            $table->string('mimetype')->nullable();;
             $table->boolean('isExpire')->default(0);
             $table->date('expires_at')->nullable();
             $table->timestamps();

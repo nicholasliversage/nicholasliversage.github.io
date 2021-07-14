@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Shared;
 use App\Document;
+use App\Category;
+use App\Department;
 
 class ShareController extends Controller
 {
@@ -18,10 +20,11 @@ class ShareController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        $shared = Shared::all();
-
-        return view('pages.shared',compact('shared'));
+    {   $user_dept = auth()->user()->department_id;
+        $shared = Document::where('depart_id','=',$user_dept)->get();
+        $dept = Department::all();
+        $cat = Category::all();
+        return view('pages.shared',compact('shared','cat','dept'));
     }
 
     /**

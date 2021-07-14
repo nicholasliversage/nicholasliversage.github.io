@@ -30,20 +30,64 @@
         <h3 class="flow-text"><i class="material-icons">info</i>Informacao do Documento</h3>
         <div class="btn-icons">
           {!! Form::open() !!}
-          <a href="/documents/{{ $doc->id }}/edit" class="btn-circle teal waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Edit this"><i class="material-icons">mode_edit</i></a>
-          <a href="/documents/open/{{ $doc->id }}" class="btn-circle blue darken-3 waves-effect waves-light tooltipped" data-position="top" data-delay="50" data-tooltip="Open this"><i class="material-icons">open_with</i></a>
+          <a href="/documents/{{ $doc->id }}/edit" class="btn-circle teal waves-effect waves-light tooltipped" data-position="left" data-delay="50" data-tooltip="Editar"><i class="material-icons">mode_edit</i></a>
+          <a href="/documents/open/{{ $doc->id }}" class="btn-circle blue darken-3 waves-effect waves-light tooltipped" data-position="top" data-delay="50" data-tooltip="Abrir"><i class="material-icons">open_with</i></a>
           {!! Form::close() !!}
-          <!-- SHARE using link -->
-          {!! Form::open(['action' => ['ShareController@update', $doc->id], 'method' => 'PATCH', 'id' => 'form-share-documents-' . $doc->id]) !!}
+
+          @hasanyrole('Root|Atendimento')
+          <!-- SHARE to user using link -->
           @can('shared')
-          <a href="#" class="btn-circle purple waves-effect waves-light data-share tooltipped" data-position="top" data-delay="50" data-tooltip="Share this" data-form="documents-{{ $doc->id }}"><i class="material-icons">share</i></a>
+          <a href="#" data-target="modal1" class="btn-circle purple waves-effect waves-light data-share tooltipped" data-position="top" data-delay="50" data-tooltip="Designar a um funcionario" data-form="documents-{{ $doc->id }}">
+            <i class="material-icons">share</i>
+          </a>
           @endcan
+          @endhasanyrole()
+          
+          
+          @if ($doc->user_id != null)
+              
+          
+          @hasanyrole('User') 
+        <!-- SHARE to user using link -->
+        
+        @can('shared')
+        {!! Form::open() !!}
+        <a href="{{ route('document.devolver',$doc->id) }}"  class="btn-circle purple waves-effect waves-light  tooltipped" data-position="top" data-delay="50" data-tooltip="Devolver ao atendimento" >
+          <i class="material-icons">share</i>
+        </a>
+        {!! Form::close() !!}
+        @endcan
+       
+          @endhasanyrole()
+
+          @else
+          @hasanyrole('User') 
+          <!-- SHARE to user using link -->
+          
+          @can('shared')
+          {!! Form::open() !!}
+          <a href="{{ route('document.take',$doc->id) }}"  class="btn-circle yellow waves-effect waves-light  tooltipped" data-position="top" data-delay="50" data-tooltip="Pegar o Documento" >
+            <i class="material-icons">check</i>
+          </a>
           {!! Form::close() !!}
+          @endcan
+         
+            @endhasanyrole()
+          @endif
+
+          @hasanyrole('Root|Atendimento')
+         <!-- SHARE to department using link -->
+          @can('shared')
+          <a href="#" data-target="modal2" class="btn-circle green waves-effect waves-light data-share tooltipped" data-position="top" data-delay="50" data-tooltip="Enviar a departmento" data-form="documents-{{ $doc->id }}">
+            <i class="material-icons">share</i>
+          </a>
+          @endcan
+          @endhasanyrole()
           <!-- DELETE using link -->
           {!! Form::open(['action' => ['DocumentsController@destroy', $doc->id],
           'method' => 'DELETE', 'id' => 'form-delete-documents-' . $doc->id]) !!}
           @can('delete')
-          <a href="#" class="btn-circle red waves-effect waves-light data-delete tooltipped" data-position="right" data-delay="50" data-tooltip="Delete this" data-form="documents-{{ $doc->id }}"><i class="material-icons">delete</i></a>
+          <a href="#" class="btn-circle red waves-effect waves-light data-delete tooltipped" data-position="right" data-delay="50" data-tooltip="Apagar" data-form="documents-{{ $doc->id }}"><i class="material-icons">delete</i></a>
           @endcan
           {!! Form::close() !!}
         </div>
@@ -72,19 +116,18 @@
                 </li>
                 <li>
                   <div class="collapsible-header"><i class="material-icons">account_circle</i>Dono</div>
-                  <div class="collapsible-body"><span class="teal-text">{{ $doc->user['name'] }}</span></div>
+                  <div class="collapsible-body"><span class="teal-text">{{ $doc->cliente_name }}</span></div>
                 </li>
-                <li>
-                  <div class="collapsible-header"><i class="material-icons">group</i>Departmento</div>
-                  <div class="collapsible-body"><span class="teal-text">{{ $doc->user->department['dptName'] }}</span></div>
-                </li>
+               
                 <li>
                   <div class="collapsible-header"><i class="material-icons">class</i>Categoria</div>
                   <div class="collapsible-body">
                     <span class="teal-text">
                       <ul>
                         @foreach($doc->categories()->get() as $cate)
+                        @if($cate->id === $doc->category_id)
                         <li>{{ $cate->name }}</li>
+                        @endif
                         @endforeach
                       </ul>
                     </span>
@@ -110,6 +153,7 @@
                   <div class="collapsible-header"><i class="material-icons">date_range</i>Data de upload</div>
                   <div class="collapsible-body"><span class="teal-text">{{ $doc->updated_at->toDayDateTimeString() }}</span></div>
                 </li>
+                @if ($doc->file != null)
                 <li>
                   <div class="collapsible-header"><i class="material-icons">info_outline</i>MetaData</div>
                   <div class="collapsible-body">
@@ -122,6 +166,7 @@
                     </span>
                   </div>
                 </li>
+                @endif
               </ul>
             </div>
             <div class="card-action">
@@ -133,11 +178,10 @@
     </div>
   </div>
 </div>
-@endsection
 
 
-<!-- medium modal -->
-<div class="modal fade" id="mediumModal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel"
+<!--users medium modal -->
+<div id="modal1" class="modal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel"
 aria-hidden="true">
 <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -148,11 +192,122 @@ aria-hidden="true">
         </div>
         <div class="modal-body" id="mediumBody">
             <div>
+              <form action="{{ route('document.user',$doc->id) }}" method="POST">
+                {{ csrf_field() }}
                 <!-- the result to be displayed apply here -->
+                <div class="card z-depth-2">
+                  <div class="card-content">
+                   
+                    <table class="bordered centered highlight" id="myDataTable">
+                      <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Role</th>
+                            <th>Departmento</th>
+                            <th>Accoes</th>
+                        </tr>
+                      </thead>
+                      
+                      <tbody>
+                        @if(count($users) > 0)
+                          @foreach($users as $user)
+                            @if(!$user->hasRole('Root'))
+                            <tr>
+                              <td>{{ $user->name }}</td>
+                              <td>{{ $user->roles()->pluck('name')->implode(' ') }}</td>
+                              <td>{{ $user->department['dptName'] }}</td>
+                              <td>
+                                <!-- ASSIGN using link -->
+                                <input type="checkbox" id="{{ $user->id }}" name="user" value="{{ $user->id }}" class="sub_chk" data-id="{{$user->id}}">
+                                <label for="{{ $user->id }}"></label>
+                              </td>
+                            </tr>
+                            @endif
+                          @endforeach
+                        @else
+                          <tr>
+                            <td colspan="4"><h5 class="teal-text">Nenhum user foi adicionado</h5></td>
+                          </tr>
+                        @endif
+                      </tbody>
+                    
+                    </table>
+                  </div>
+                  <div class="input-field">
+                    <input type="submit" class= 'btn waves-effect waves-light' value="Enviar">
+                  </div>
+                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 </div>
+
+
+<!--departments medium modal -->
+<div id="modal2" class="modal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel"
+aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" id="mediumBody">
+            <div>
+              <form action="{{ route('document.department',$doc->id) }}" method="POST">
+                {{ csrf_field() }}
+                <!-- the result to be displayed apply here -->
+                <div class="card z-depth-2">
+                  <div class="card-content">
+                   
+                    <table class="bordered centered highlight" id="myDataTable">
+                      <thead>
+                        <tr>  
+                            <th>Departmento</th>
+                            <th>Accoes</th>
+                        </tr>
+                      </thead>
+                      
+                      <tbody>
+                        @if(count($depart) > 0)
+                          @foreach($depart as $dept)
+                            
+                            <tr>
+                              
+                              <td>{{ $dept->dptName }}</td>
+                              <td>
+                                <!-- ASSIGN using link -->
+                                <input type="checkbox" id="{{ $dept->id }}" name="depart" value="{{ $dept->id }}" class="sub_chk" data-id="{{$dept->id}}">
+                                <label for="{{ $dept->id }}"></label>
+                              </td>
+                            </tr>
+                           
+                          @endforeach
+                        @else
+                          <tr>
+                            <td colspan="4"><h5 class="teal-text">Nenhum departamento foi adicionado</h5></td>
+                          </tr>
+                        @endif
+                      </tbody>
+                    
+                    </table>
+                  </div>
+                  <div class="input-field">
+                    <input type="submit" class= 'btn waves-effect waves-light' value="Enviar">
+                  </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+@endsection
+
+
+
 
 

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Document;
 use App\Category;
+use App\User;
+use App\Department;
 use Illuminate\Support\Facades\Storage;
 use DB;
 
@@ -21,10 +23,18 @@ class DocumentsController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->hasRole('Root'))
+      $category = Category::all();
+      $users = User::all();
+      
+        if (auth()->user()->hasAnyRole('Root'))
         {
             // get all
             $docs = Document::where('isExpire','!=',2)->get();
+            
+
+        }
+        elseif(auth()->user()->hasAnyRole('Atendimento')){
+          $docs = Document::where('user_id',null)->get();
         }
         else
         {
@@ -34,15 +44,15 @@ class DocumentsController extends Controller
             // $docs = Document::where('user_id',$user_id)->get();
 
             // get docs in dept
-            $dept_id = auth()->user()->department_id;
+           // $dept_id = auth()->user()->department_id;
 
            // $docs = Document::where('isExpire','!=',2)->where('department_id',$dept_id)->where('user_id','=',auth()->user()->id)->get();
-           $docs = Document::where('isExpire','!=',2)->where('department_id',$dept_id)->get();
+           $docs = Document::where('isExpire','!=',2)->where('user_id','=',auth()->user()->id)->get();
 
           }
         $filetype = null;
 
-        return view('documents.index',compact('docs','filetype'));
+        return view('documents.index',compact('docs','filetype','category','users'));
     }
 
     // my documents
@@ -79,7 +89,7 @@ class DocumentsController extends Controller
         $this->validate($request, [
           'name' => 'required|string|max:255',
           'description' => 'required|string|max:255',
-          'file' => 'required|max:50000',
+         
         ]);
 
         // get the data of uploaded user
@@ -141,8 +151,9 @@ class DocumentsController extends Controller
     public function show($id)
     {
         $doc = Document::findOrFail($id);
-
-        return view('documents.show',compact('doc'));
+        $depart = Department::all();
+        $users = User::all();
+        return view('documents.show',compact('doc','users','depart'));
     }
 
     /**
@@ -189,6 +200,51 @@ class DocumentsController extends Controller
         \Log::addToLog('Document ID '.$id.' was edited');
 
         return redirect('/documents')->with('success','Successfully Updated!');
+    }
+
+    public function removeUser(Request $request,$id){
+
+      $user = auth()->user();
+      $doc = Document::findOrFail($id);
+      $doc->user_id = null;
+      $doc->save();
+
+        \Log::addToLog('Document ID '.$id.' was edited');
+      return redirect('/documents')->with('success','Successfully Updated!');
+
+    }
+     
+    public function takeDocument(Request $request,$id){
+      
+      $doc = Document::findOrFail($id);
+      $user = auth()->user();
+      $doc->user_id = $user->id;
+      $doc->save();
+      \Log::addToLog('Document ID '.$id.' was edited');
+
+      return redirect('/documents')->with('success','Successfully Updated!');
+    }
+
+
+    public function assignToUser(Request $request,$id){
+      
+      $doc = Document::findOrFail($id);
+      $doc->user_id = $request->input('user');
+      $doc->save();
+      \Log::addToLog('Document ID '.$id.' was edited');
+
+      return redirect('/documents')->with('success','Successfully Updated!');
+    }
+
+
+    public function assignToDepartment(Request $request,$id){
+      
+      $doc = Document::findOrFail($id);
+      $doc->depart_id = $request->input('depart');
+      $doc->save();
+      \Log::addToLog('Document ID '.$id.' was edited');
+
+      return redirect('/documents')->with('success','Successfully Updated!');
     }
 
     /**
