@@ -32,7 +32,7 @@ class ClienteController extends Controller
             'email' => 'required|email',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:8',
             'description' => 'required|string|max:255',
-            'file' => 'required|max:50000',
+            
           ]);
   
           // get the data of uploaded user
@@ -49,6 +49,7 @@ class ClienteController extends Controller
           $doc = new Document;
           $doc->description = $request->input('description');
           $doc->cliente_name = $request->input('name');
+          $doc->cliente_id = $cliente->id;
         //  $doc->user_id = $user_id;
         //  $doc->department_id = $department_id;
         // handle file upload
@@ -96,15 +97,16 @@ class ClienteController extends Controller
           'email' => $request->get('email'),
           'phone' => $request->get('phone'),
           'subject' => $cat->name,
-          'user_query' => $request->get('description'),
+          'user_query' => $request->get('description')
       ), function($message) use ($request){
-          $message->from('nicolasliversage@gmail.com');
-          $message->to('vergil99966@gmail.com', 'FIPAG')->subject($request->get('category'));
+          $message->from($request->get('email'));
+          $message->to('vergil99966@gmail.com', 'FIPAG')->subject($request->input('category'));
       });
           //$doc->categories()->sync($request->category_id);
   
-          \Log::addToLog('New Document, '.$request->input('name').' was uploaded');
+          \Log::addToLog('Nova Carta, O cliente '.$request->get('name').' enviou uma nova carta',
+        $cliente->name,$cliente->id);
   
-          return redirect('/cliente')->with('success','File Uploaded');
+          return redirect('/cliente')->with('success','A sua carta foi enviada');
       }
 }

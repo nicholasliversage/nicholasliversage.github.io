@@ -10,7 +10,7 @@
 		<div class="row">
 			<h3 class="flow-text"><i class="material-icons">view_list</i> Actividades dos Usuarios
 			@can('root')
-			<a href="logsdel" data-position="left" data-delay="50" data-tooltip="Clear All" class="right tooltipped pulse"><i class="material-icons">clear_all</i></a>
+			<a href="logsdel" data-position="left" data-delay="50" data-tooltip="Limpar os logs" class="right tooltipped pulse"><i class="material-icons">delete</i></a>
 			@endcan
 			</h3>
 			<div class="divider"></div>
@@ -29,11 +29,8 @@
 						<blockquote>
 							<ul>
 								<li>Subject => {{ $log->subject }}</li>
-								<li>URL => {{ $log->url }}</li>
-								<li>Method => {{ $log->method }}</li>
-								<li>IP => {{ $log->ip }}</li>
-								<li>Agent => {{ $log->agent }}</li>
-								<li>User ID => {{ $log->user_id }}</li>
+								<li>Usuario => {{ $log->user_name }}</li>
+								<li>Usuario ID => {{ $log->user_id }}</li>
 							</ul>
 						</blockquote>
 					</div>

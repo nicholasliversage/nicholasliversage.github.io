@@ -42,10 +42,9 @@
     <!-- Desktop View -->
     <ul class="right hide-on-med-and-down">
       <!-- Authentication Links -->
-      @if (Auth::guest())
-        <li><a href="{{ route('login') }}">Login</a></li>
-        <li><a href="{{ route('register') }}">Register</a></li>
-      @else
+      @if (Auth::guest()==false)
+        
+      
         <!-- Dropdown Trigger -->
         <li>
           <a href="" class="datepicker"><i class="material-icons">date_range</i></a>

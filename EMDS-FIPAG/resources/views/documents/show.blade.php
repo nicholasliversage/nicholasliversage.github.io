@@ -78,18 +78,23 @@
           @hasanyrole('Root|Atendimento')
          <!-- SHARE to department using link -->
           @can('shared')
-          <a href="#" data-target="modal2" class="btn-circle green waves-effect waves-light data-share tooltipped" data-position="top" data-delay="50" data-tooltip="Enviar a departmento" data-form="documents-{{ $doc->id }}">
+          <a href="#" data-target="modal2" class="btn-circle green waves-effect waves-light  tooltipped" data-position="top" data-delay="50" data-tooltip="Enviar a departmento" data-form="documents-{{ $doc->id }}">
             <i class="material-icons">share</i>
           </a>
           @endcan
           @endhasanyrole()
+
+          @hasanyrole('Root|Atendimento')
           <!-- DELETE using link -->
-          {!! Form::open(['action' => ['DocumentsController@destroy', $doc->id],
-          'method' => 'DELETE', 'id' => 'form-delete-documents-' . $doc->id]) !!}
           @can('delete')
-          <a href="#" class="btn-circle red waves-effect waves-light data-delete tooltipped" data-position="right" data-delay="50" data-tooltip="Apagar" data-form="documents-{{ $doc->id }}"><i class="material-icons">delete</i></a>
-          @endcan
+          {!! Form::open() !!}
+          <a href="{{route('document.sms',$doc->id)}}"  class="btn-circle red waves-effect waves-light  tooltipped" data-position="right" data-delay="50" data-tooltip="Enviar resposta ao cliente" >
+            <i class="material-icons">mail</i>
+          </a>
           {!! Form::close() !!}
+          @endcan
+          
+          @endhasanyrole()
         </div>
       </div>
       <div class="col s12 m11">
@@ -107,16 +112,20 @@
               @endif
               <ul class="collapsible" data-collapsible="accordion">
                 <li>
-                  <div class="collapsible-header active"><i class="material-icons">folder</i>Nome do documento</div>
-                  <div class="collapsible-body"><span class="teal-text">{{ $doc->name }}</span></div>
+                  <div class="collapsible-header active"><i class="material-icons">account_circle</i>Nome do Cliente</div>
+                  <div class="collapsible-body"><span class="teal-text">{{ $doc->cliente_name }}</span></div>
                 </li>
                 <li>
                   <div class="collapsible-header"><i class="material-icons">description</i>Descricao</div>
                   <div class="collapsible-body"><span class="teal-text">{{ $doc->description }}</span></div>
                 </li>
                 <li>
-                  <div class="collapsible-header"><i class="material-icons">account_circle</i>Dono</div>
-                  <div class="collapsible-body"><span class="teal-text">{{ $doc->cliente_name }}</span></div>
+                  <div class="collapsible-header"><i class="material-icons">account_circle</i>Funcionario designado</div>
+                  @if ($doc->user_id != null)
+                  <div class="collapsible-body"><span class="teal-text">{{ $doc->cliente_name }}</span></div>  
+                @else
+                <div class="collapsible-body"><span class="teal-text">Nenhum funcionario designado</span></div>
+                  @endif
                 </li>
                
                 <li>
@@ -124,11 +133,9 @@
                   <div class="collapsible-body">
                     <span class="teal-text">
                       <ul>
-                        @foreach($doc->categories()->get() as $cate)
-                        @if($cate->id === $doc->category_id)
-                        <li>{{ $cate->name }}</li>
-                        @endif
-                        @endforeach
+                       
+                        <li>{{ $cat->name }}</li>
+                       
                       </ul>
                     </span>
                   </div>
@@ -146,11 +153,11 @@
                   </div>
                 </li>
                 <li>
-                  <div class="collapsible-header"><i class="material-icons">date_range</i>Data de expiracao</div>
+                  <div class="collapsible-header"><i class="material-icons">date_range</i>Data de Upload</div>
                   <div class="collapsible-body"><span class="teal-text">{{ $doc->created_at->toDayDateTimeString() }}</span></div>
                 </li>
                 <li>
-                  <div class="collapsible-header"><i class="material-icons">date_range</i>Data de upload</div>
+                  <div class="collapsible-header"><i class="material-icons">date_range</i>Ultima Modificacao</div>
                   <div class="collapsible-body"><span class="teal-text">{{ $doc->updated_at->toDayDateTimeString() }}</span></div>
                 </li>
                 @if ($doc->file != null)
@@ -218,8 +225,8 @@ aria-hidden="true">
                               <td>{{ $user->department['dptName'] }}</td>
                               <td>
                                 <!-- ASSIGN using link -->
-                                <input type="checkbox" id="{{ $user->id }}" name="user" value="{{ $user->id }}" class="sub_chk" data-id="{{$user->id}}">
-                                <label for="{{ $user->id }}"></label>
+                                <input type="checkbox" id="{{ $user->id }}u" name="user" value="{{ $user->id }}" class="sub_chk" data-id="{{$user->id}}u">
+                                <label for="{{ $user->id }}u"></label>
                               </td>
                             </tr>
                             @endif
@@ -305,6 +312,7 @@ aria-hidden="true">
     </div>
 </div>
 </div>
+
 @endsection
 
 

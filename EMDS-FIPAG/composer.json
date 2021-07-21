@@ -14,8 +14,11 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.3",
         "laravelcollective/html": "^6.2",
+        "nexmo/client": "^2.4",
+        "nexmo/laravel": "^2.4",
         "spatie/laravel-backup": "^7.3.3",
-        "spatie/laravel-permission": "^4.2"
+        "spatie/laravel-permission": "^4.2",
+        "vonage/client": "^2.4"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

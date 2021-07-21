@@ -7,6 +7,7 @@ use App\Document;
 use App\Category;
 use App\User;
 use App\Department;
+use App\Cliente;
 use Illuminate\Support\Facades\Storage;
 use DB;
 
@@ -25,7 +26,7 @@ class DocumentsController extends Controller
     {
       $category = Category::all();
       $users = User::all();
-      
+      $dept = Department::all();
         if (auth()->user()->hasAnyRole('Root'))
         {
             // get all
@@ -52,7 +53,7 @@ class DocumentsController extends Controller
           }
         $filetype = null;
 
-        return view('documents.index',compact('docs','filetype','category','users'));
+        return view('documents.index',compact('docs','filetype','category','users','dept'));
     }
 
     // my documents
@@ -62,8 +63,8 @@ class DocumentsController extends Controller
         $user_id = auth()->user()->id;
 
         $docs = Document::where('user_id',$user_id)->get();
-
-        return view('documents.mydocuments',compact('docs'));
+        $cat = Category::all();
+        return view('documents.mydocuments',compact('docs','cat'));
     }
 
     /**
@@ -153,7 +154,13 @@ class DocumentsController extends Controller
         $doc = Document::findOrFail($id);
         $depart = Department::all();
         $users = User::all();
-        return view('documents.show',compact('doc','users','depart'));
+        $cat = Category::where('id','=',$doc->category_id)->first('name');
+
+        $user = auth()->user();
+        \Log::addToLog('O Documento do cliente '.$doc->cliente_name.' foi aberto',
+        $user->name,$user->id);  
+
+        return view('documents.show',compact('doc','users','depart','cat'));
     }
 
     /**
@@ -202,15 +209,25 @@ class DocumentsController extends Controller
         return redirect('/documents')->with('success','Successfully Updated!');
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function removeUser(Request $request,$id){
 
-      $user = auth()->user();
+      //$user = auth()->user();
       $doc = Document::findOrFail($id);
       $doc->user_id = null;
       $doc->save();
 
-        \Log::addToLog('Document ID '.$id.' was edited');
-      return redirect('/documents')->with('success','Successfully Updated!');
+      $users = auth()->user();
+
+      \Log::addToLog('O Documento do cliente '.$doc->cliente_name.' foi  devolvido ao atendimento',
+      $users->name,$users->id);  
+      return redirect('/documents')->with('success','O documento foi devolvido ao atendimento!');
 
     }
      
@@ -220,9 +237,12 @@ class DocumentsController extends Controller
       $user = auth()->user();
       $doc->user_id = $user->id;
       $doc->save();
-      \Log::addToLog('Document ID '.$id.' was edited');
 
-      return redirect('/documents')->with('success','Successfully Updated!');
+      $users = auth()->user();
+      \Log::addToLog('O Documento do cliente '.$doc->client_name.' foi pegue',
+      $users->name,$users->id);  
+
+      return redirect('/documents')->with('success','O Documento foi entregado ao usuario!');
     }
 
 
@@ -231,9 +251,22 @@ class DocumentsController extends Controller
       $doc = Document::findOrFail($id);
       $doc->user_id = $request->input('user');
       $doc->save();
-      \Log::addToLog('Document ID '.$id.' was edited');
+      $user = User::where('id','=',$doc->user_id)->first();
+      $client = Cliente::where('id','=',$doc->cliente_id)->first();
+      \Mail::send('inc.mailToUser', array(
+        'name' => $client->name,
+        'email' => $client->email,
+        'phone' =>$client->telefone,
+        'user_query' => 'Nova carta foi designada ao usuario'
+    ), function($message) use ($user){
+        $message->from('vergil99966@gmail.com');
+        $message->to($user->email, $user->name)->subject('Nova carta foi designada ao usuario');
+    });
+    $users = auth()->user();
+      \Log::addToLog('O Documento do cliente '.$client->name.' foi partilhado ao usuario: '.$user->name.' ',
+      $users ->name,$users ->id);
 
-      return redirect('/documents')->with('success','Successfully Updated!');
+      return redirect('/documents')->with('success','O documento foi partilhado ao usuario!');
     }
 
 
@@ -242,9 +275,19 @@ class DocumentsController extends Controller
       $doc = Document::findOrFail($id);
       $doc->depart_id = $request->input('depart');
       $doc->save();
-      \Log::addToLog('Document ID '.$id.' was edited');
+      $user = auth()->user();
+      $dept = Department::findOrFail($doc->depart_id );
+      \Log::addToLog('O Documento do cliente '.$doc->client_name.' foi partilhado ao departamento: '.$dept->dptName.' ',
+      $user->name,$user->id);
 
-      return redirect('/documents')->with('success','Successfully Updated!');
+      return redirect('/documents')->with('success','O Documento foi partilhado ao departmento!');
+    }
+
+    public function smsNotifyPage($id){
+
+      $doc_id = $id;
+
+      return view('documents.delete',compact('doc_id'));
     }
 
     /**
@@ -253,17 +296,44 @@ class DocumentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
-        $doc = Document::findOrFail($id);
+      
+      $doc = Document::findOrFail($id);
+      $cliente = Cliente::where('id','=',$doc->cliente_id)->first();
+           /* 
+           $client = new \Nexmo\Client($basic);
+           $basic  = new \Nexmo\Client\Credentials\Basic(env('NEXMO_KEY'), env('NEXMO_SECRET'));
+
+      $message = $client->message()->send([
+          'to' => $cliente->telefone,
+          'from' => 'FIPAG',
+          'text' => $request->get('description')
+      ]);*/
+
+
+      \Mail::send('inc.mailToCliente', array(
+        'name' => $cliente->name,
+        'email' => $cliente->email,
+        'phone' =>$cliente->telefone,
+        'user_query' => $request->get('description')
+    ), function($message) use ($cliente){
+        $message->from('vergil99966@gmail.com');
+        $message->to($cliente->email, $cliente->name)->subject('Resposta a sua carta');
+    });
+        //$doc = Document::findOrFail($id);
         // delete the file on disk
         Storage::delete($doc->file);
         // delete db record
         $doc->delete();
-        // delete associated categories
-        $doc->categories()->detach();
+        
+        $user = auth()->user();
 
-        \Log::addToLog('Document ID '.$id.' was deleted');
+        \Log::addToLog('O Documento do cliente '.$cliente->name.' foi  arquivado',
+        $user->name,$user->id);       
+         \Log::addToLog('Foi enviada resposta ao cliente: ' . $cliente->name,
+         $user->name,$user->id);
+    
 
         return redirect('/documents')->with('success','Deleted!');
     }
@@ -324,13 +394,13 @@ class DocumentsController extends Controller
         ]);
 
         $srch = strtolower($request->input('search'));
-        $names = Document::pluck('name')->all();
+        $names = Document::pluck('cliente_name')->all();
         $results = [];
 
         for ($i=0; $i < count($names); $i++) {
           $lower = strtolower($names[$i]);
           if (strpos($lower, $srch) !== false) {
-            $results[$i] = Document::where('name', $names[$i])->get();
+            $results[$i] = Document::where('cliente_name', $names[$i])->get();
           }
         }
 

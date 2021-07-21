@@ -62,11 +62,13 @@
     <div class="col m11 s12">
       <div class="row">
         <h3 class="flow-text"><i class="material-icons">folder</i> Documentos
+         <!--
           @hasrole('Atendimento')
         @can('upload')
           <a href="/documents/create" class="btn waves-effect waves-light right tooltipped" data-position="left" data-delay="50" data-tooltip="Upload New Document"><i class="material-icons">file_upload</i></a>
         @endcan
         @endhasrole
+         -->
         </h3>
         <div class="divider"></div>
       </div>
@@ -84,20 +86,7 @@
           <!-- FOLDER View -->
           <div id="folderView">
             <div class="row">
-              <form action="/sort" method="post" id="sort-form">
-                {{ csrf_field() }}
-                <div class="input-field col m2 s12">
-                  <select name="filetype" id="sort">
-                    <option value="" disabled selected>Choose</option>
-                    <option value="image/jpeg" @if($filetype === 'image/jpeg') selected @endif>Imagens</option>
-                    <option value="video/mp4" @if($filetype === 'video/mp4') selected @endif>Videos</option>
-                    <option value="audio/mpeg" @if($filetype === 'audio/mpeg') selected @endif>Audio</option>
-                    <option value="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Documentos Word</option>
-                    <option value="">Outros</option>
-                  </select>
-                  <label>Ordem dos Documentos</label>
-                </div>
-              </form>
+              
               <form action="/search" method="post" id="search-form">
                 {{ csrf_field() }}
                 <div class="input-field col m4 s12 right">
@@ -155,7 +144,7 @@
                 <thead>
                   <tr>
                       <th></th>
-                      <th>Nome do Ficheiro</th>
+                      <th>Categoria</th>
                       <th>Dono</th>
                       <th>Departmento</th>
                       <th>Data de upload</th>
@@ -176,7 +165,16 @@
                       @endif
                       @endforeach
                     
-                      
+                      <td>{{ $doc->cliente_name }}</td>
+                      @if ($doc->depart_id == null)
+                         <td>Nao foi designado a um departamento</td> 
+                      @else
+                      @foreach( $dept as $dt)
+                      @if ($dt->id === $doc->depart_id)
+                      <td>{{ $dt->dptName  }}</td>
+                      @endif
+                      @endforeach
+                      @endif
                       <td>{{ $doc->created_at->toDayDateTimeString() }}</td>
                       <td>
                         @if($doc->isExpire)
@@ -201,7 +199,7 @@
                         {!! Form::close() !!}
                         <!-- SHARE using link -->
                         @can('shared')
-                        <a href="#" data-target="modal1" class="btn-circle purple waves-effect waves-light data-share tooltipped" data-position="top" data-delay="50" data-tooltip="Designar a um funcionario" >
+                        <a href="#" data-target="modal1" class=" tooltipped" data-position="top" data-delay="50" data-tooltip="Designar a um funcionario" >
                           <i class="material-icons">share</i>
                         </a>                       
                          @endcan

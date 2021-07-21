@@ -9,9 +9,7 @@
     <div class="col m11 s12">
       <div class="row">
         <h3 class="flow-text"><i class="material-icons">folder</i> Meus Documentos
-        @can('upload')
-          <a href="/documents/create" class="btn waves-effect waves-light right tooltipped" data-position="left" data-delay="50" data-tooltip="Upload New Document"><i class="material-icons">file_upload</i> New</a>
-        @endcan
+        
         </h3>
         <div class="divider"></div>
       </div>
@@ -20,7 +18,7 @@
           <table class="bordered centered highlight responsive-table" id="myDataTable">
             <thead>
               <tr>
-                  <th>Nome do Ficheiro</th>
+                  <th>Categoria</th>
                   <th>Tipo</th>
                   <th>Tamanho</th>
                   <th>Data do upload</th>
@@ -32,7 +30,11 @@
               @if(count($docs) > 0)
                 @foreach($docs as $doc)
                 <tr>
-                  <td>{{ $doc->name }}</td>
+                  @foreach( $cat as $ct)
+                      @if ($ct->id === $doc->category_id)
+                      <td>{{ $ct->name  }}</td>
+                      @endif
+                      @endforeach
                   <td>{{ $doc->mimetype }}</td>
                   <td>{{ $doc->filesize }}</td>
                   <td>{{ $doc->created_at->toDayDateTimeString() }}</td>

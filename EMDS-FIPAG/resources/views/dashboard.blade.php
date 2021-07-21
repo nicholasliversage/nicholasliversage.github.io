@@ -24,7 +24,7 @@
             <div class="card hoverable indigo lighten-1 white-text">
               <div class="card-content">
                 <p class="center"><i class="large material-icons">person</i></p>
-                <h4 class="center-align flow-text">Ususarios<span class="new badge white-text">45</span></h4>
+                <h4 class="center-align flow-text">Usuarios<span class="new badge white-text">45</span></h4>
               </div>
             </div>
           </div>
