@@ -20,7 +20,6 @@ class CreateDocumentTable extends Migration
             $table->integer('depart_id')->nullable();
             $table->integer('user_id')->nullable();
             $table->string('cliente_name');
-            $table->integer('cliente_id');
             $table->string('file')->nullable();
             $table->string('filesize')->nullable();
             $table->string('mimetype')->nullable();;

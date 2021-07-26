@@ -13,6 +13,8 @@
   $('#modal1').modal();
   // modal for help
   $('#modal2').modal();
+  $('#loginModal').modal();
+  $('#devModal').modal();
   // DELETE using link
   $(function () {
       $('.data-delete').on('click', function (e) {
@@ -24,7 +26,7 @@
   // SHARE using link
   $(function () {
       $('.data-share').on('click', function (e) {
-          if (!confirm('Are you sure you want to share?')) return;
+          if (!confirm('Tem Certeza que deseja partilhar?')) return;
           e.preventDefault();
           $('#form-share-' + $(this).data('form')).submit();
       });

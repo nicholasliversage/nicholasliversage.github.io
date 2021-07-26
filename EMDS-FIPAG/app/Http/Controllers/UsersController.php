@@ -92,10 +92,7 @@ class UsersController extends Controller
         $role_r = Role::where('id',$role)->firstOrFail();
         $user->assignRole($role_r);
 
-        $users = auth()->user();
-
-        \Log::addToLog('Novo usuario foi adicionado '.$user->name.'',
-        $users->name,$users->id);       
+        \Log::addToLog('Created a user');
 
         return redirect('/users')->with('success','User Added');
     }

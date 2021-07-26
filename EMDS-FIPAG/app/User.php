@@ -41,4 +41,9 @@ class User extends Authenticatable
     public function documents() {
         return $this->hasMany('App\Document');
     }
+
+    public function messages()
+{
+    return $this->hasMany(Message::class);
+}
 }

@@ -62,13 +62,11 @@
     <div class="col m11 s12">
       <div class="row">
         <h3 class="flow-text"><i class="material-icons">folder</i> Documentos
-         <!--
           @hasrole('Atendimento')
         @can('upload')
           <a href="/documents/create" class="btn waves-effect waves-light right tooltipped" data-position="left" data-delay="50" data-tooltip="Upload New Document"><i class="material-icons">file_upload</i></a>
         @endcan
         @endhasrole
-         -->
         </h3>
         <div class="divider"></div>
       </div>
@@ -86,7 +84,20 @@
           <!-- FOLDER View -->
           <div id="folderView">
             <div class="row">
-              
+              <form action="/sort" method="post" id="sort-form">
+                {{ csrf_field() }}
+                <div class="input-field col m2 s12">
+                  <select name="filetype" id="sort">
+                    <option value="" disabled selected>Choose</option>
+                    <option value="image/jpeg" @if($filetype === 'image/jpeg') selected @endif>Imagens</option>
+                    <option value="video/mp4" @if($filetype === 'video/mp4') selected @endif>Videos</option>
+                    <option value="audio/mpeg" @if($filetype === 'audio/mpeg') selected @endif>Audio</option>
+                    <option value="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Documentos Word</option>
+                    <option value="">Outros</option>
+                  </select>
+                  <label>Ordem dos Documentos</label>
+                </div>
+              </form>
               <form action="/search" method="post" id="search-form">
                 {{ csrf_field() }}
                 <div class="input-field col m4 s12 right">
@@ -121,7 +132,7 @@
                         <i class="material-icons">folder_open</i>
                         @endif
                         <h5>{{ $doc->cliente_name }}</h5>
-                        @foreach( $category as $cate)
+                        @foreach( $cat as $cate)
                         @if ($cate->id === $doc->category_id)
                         <h6>{{ $cate->name  }}<h6>
                        @endif
@@ -143,84 +154,48 @@
               <table class="bordered centered highlight responsive-table" id="myDataTable">
                 <thead>
                   <tr>
-                      <th></th>
+                      
                       <th>Categoria</th>
-                      <th>Dono</th>
+                      <th>Cliente</th>
                       <th>Departmento</th>
                       <th>Data de upload</th>
-                      <th>Data de expiracao</th>
                       <th>Accoes</th>
                   </tr>
                 </thead>
                 <tbody>
                   @if(count($docs) > 0)
                     @foreach($docs as $doc)
-                    <tr id="tr_{{$doc->id}}">
-                      <td>
-                        <label for="chk_{{ $doc->id }}"></label>
-                      </td>
-                      @foreach( $category as $cate)
-                      @if ($cate->id === $doc->category_id)
-                      <td>{{ $cate->name  }}</td>
+                    <tr>
+                      @foreach ($cat as $c )
+                      @if ($c->id == $doc->category_id)
+                      <td>{{ $c->name}}</td> 
                       @endif
                       @endforeach
-                    
                       <td>{{ $doc->cliente_name }}</td>
-                      @if ($doc->depart_id == null)
-                         <td>Nao foi designado a um departamento</td> 
-                      @else
-                      @foreach( $dept as $dt)
-                      @if ($dt->id === $doc->depart_id)
-                      <td>{{ $dt->dptName  }}</td>
+                      @if($doc->depart_id != null)
+                      @foreach ($dept as $dep)
+                      @if ($dep->id == $doc->depart_id)
+                      <td>{{ $dep->dptName }}</td> 
                       @endif
                       @endforeach
+                      @else
+                      <td>Nao pertence a nehnum departamento</td>
                       @endif
                       <td>{{ $doc->created_at->toDayDateTimeString() }}</td>
                       <td>
-                        @if($doc->isExpire)
-                          {{ $doc->expires_at }}
-                        @else
-                          Nao expira
-                        @endif
-                      </td>
-                      <td>
-                        @can('read')
-                        {!! Form::open() !!}
-                        <a href="documents/{{ $doc->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="View Details"><i class="material-icons">visibility</i></a>
-                        {!! Form::close() !!}
-                        {!! Form::open() !!}
-                        <a href="documents/open/{{ $doc->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Open"><i class="material-icons">open_with</i></a>
-                        {!! Form::close() !!}
-                        @endcan
-                        {!! Form::open() !!}
-                        @can('download')
-                        <a href="documents/download/{{ $doc->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Download"><i class="material-icons">file_download</i></a>
-                        @endcan
-                        {!! Form::close() !!}
-                        <!-- SHARE using link -->
-                        @can('shared')
-                        <a href="#" data-target="modal1" class=" tooltipped" data-position="top" data-delay="50" data-tooltip="Designar a um funcionario" >
-                          <i class="material-icons">share</i>
-                        </a>                       
-                         @endcan
-                        {!! Form::open() !!}
-                        @can('edit')
-                        <a href="documents/{{ $doc->id }}/edit" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Edit"><i class="material-icons">mode_edit</i></a>
-                        @endcan
-                        {!! Form::close() !!}
-                        <!-- DELETE using link -->
-                        {!! Form::open(['action' => ['DocumentsController@destroy', $doc->id],
-                        'method' => 'DELETE', 'id' => 'form-delete-documents-' . $doc->id]) !!}
-                        @can('delete')
-                        <a href="" class="data-delete tooltipped" data-position="left" data-delay="50" data-tooltip="Delete" data-form="documents-{{ $doc->id }}"><i class="material-icons">delete</i></a>
-                        @endcan
-                        {!! Form::close() !!}
+                        <p>
+                          <a href="documents/{{ $doc->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Abrir"><i class="material-icons">open_with</i></a>
+                        </p>
+                        <br>
+                        <p>
+                          <a href="documents/download/{{ $doc->id }}" class="tooltipped" data-position="left" data-delay="50" data-tooltip="Baixar"><i class="material-icons">file_download</i></a>
+                        </p>
                       </td>
                     </tr>
                     @endforeach
                   @else
                     <tr>
-                      <td colspan="6"><h5 class="teal-text">Nenhum documento encontrado</h5></td>
+                      <td colspan="6"><h5 class="teal-text">Nenhum documento foi partilhado</h5></td>
                     </tr>
                   @endif
                 </tbody>

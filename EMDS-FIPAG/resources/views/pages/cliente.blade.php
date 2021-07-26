@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row">
-      <div>
+      <div class="col m8 offset-m2 s12">
         {!! Form::open(['action' => 'ClienteController@store', 'method' => 'POST', 'enctype' => 'multipart/form-data', 'class' => 'col s12']) !!}
         {{ csrf_field() }}
         <div class="card hoverable">
@@ -46,10 +46,8 @@
                 
                   <div class="input-field">
                     <i class="material-icons prefix">message</i>
-                    <br>
-                    
-
-                    {{ Form::textarea('description','',['name'=>'description','class' => 'ckeditor form-control', 'id' => 'description']) }}
+                    {{ Form::text('description','',['class' => 'validate', 'id' => 'description']) }}
+                    <label for="description">Mensagem </label>
                     @if ($errors->has('description'))
                       <span class="red-text"><strong>{{ $errors->first('description') }}</strong></span>
                     @endif

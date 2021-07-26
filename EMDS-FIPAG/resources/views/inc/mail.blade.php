@@ -1,4 +1,4 @@
-<h2>Entrada de uma nova carta</h2> <br><br>
+<h2>Bem vindo</h2> <br><br>
 
 Tem uma nova carta de  : {{ $name }} <br><br>
 

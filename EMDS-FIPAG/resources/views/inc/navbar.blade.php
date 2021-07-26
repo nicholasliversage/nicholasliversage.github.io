@@ -43,9 +43,7 @@
     <ul class="right hide-on-med-and-down">
       <!-- Authentication Links -->
       @if (Auth::guest()==false)
-        
-      
-        <!-- Dropdown Trigger -->
+       
         <li>
           <a href="" class="datepicker"><i class="material-icons">date_range</i></a>
         </li>

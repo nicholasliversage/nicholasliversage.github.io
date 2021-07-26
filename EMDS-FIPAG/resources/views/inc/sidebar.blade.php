@@ -4,27 +4,27 @@
       <a href="#" class="button-collapse tooltipped" data-activates="slide-out" data-position="right" data-delay="50" data-tooltip="Menu"><i class="material-icons circle grey">menu</i></a>
     </li>
     <li class="collection-item avatar">
-      <a href="/shared" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Documentos Partilhados"><i class="material-icons circle purple lighten-1">share</i></a>
+      <a href="/shared" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Shared Files"><i class="material-icons circle purple lighten-1">share</i></a>
     </li>
     <li class="collection-item avatar">
-      <a href="/documents" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Documentos"><i class="material-icons circle blue darken-1">folder</i></a>
+      <a href="/documents" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Documents"><i class="material-icons circle blue darken-1">folder</i></a>
     </li>
     <li class="collection-item avatar">
-      <a href="/categories" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Categorias"><i class="material-icons circle brown">class</i></a>
+      <a href="/categories" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Categories"><i class="material-icons circle brown">class</i></a>
     </li>
     @hasanyrole('Root|Admin')
     <li class="collection-item avatar">
-      <a href="/users" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Usuarios"><i class="material-icons circle green">person</i></a>
+      <a href="/users" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Users"><i class="material-icons circle green">person</i></a>
     </li>
     @hasrole('Root')
     <li class="collection-item avatar">
-      <a href="/departments" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Departmentos"><i class="material-icons circle red darken-1">group</i></a>
+      <a href="/departments" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Departments"><i class="material-icons circle red darken-1">group</i></a>
     </li>
     <li class="collection-item avatar">
       <a href="/roles" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Roles &amp; Permissions"><i class="material-icons circle cyan darken-1">assignment_ind</i></a>
     </li>
     <li class="collection-item avatar">
-      <a href="/backup" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Backups"><i class="material-icons circle indigo assent-1">backup</i></a>
+      <a href="/backup" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Backup Manager"><i class="material-icons circle indigo assent-1">backup</i></a>
     </li>
     <li class="collection-item avatar">
       <a href="/logs" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Logs"><i class="material-icons circle orange">view_list</i></a>
@@ -33,9 +33,10 @@
     @endhasanyrole
     @hasanyrole('Admin|User')
     <li class="collection-item avatar">
-      <a href="/mydocuments" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Meus Documentos"><i class="material-icons circle pink darken-1">folder_shared</i></a>
+      <a href="/mydocuments" class="tooltipped" data-position="right" data-delay="50" data-tooltip="My Documents"><i class="material-icons circle pink darken-1">folder_shared</i></a>
     </li>
     @endhasanyrole
+    
   </ul>
 </div>
 <!-- ======================================================================= -->

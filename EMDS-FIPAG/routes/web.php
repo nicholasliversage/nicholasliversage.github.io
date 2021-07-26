@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\MailController;
+use App\Http\Livewire;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,6 +15,8 @@ use App\Http\Controllers\MailController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/history/{id}', 'MessageController@index');
+Route::resource('messages', 'MessageController');
 
 Route::get('/',function() {
     // display index page
@@ -44,7 +47,6 @@ Route::resource('categories','CategoriesController');
 Route::delete('categoriesDeleteMulti', 'CategoriesController@deleteMulti');
 // documents
 Route::resource('documents','DocumentsController');
-
 Route::get('documents/download/{id}','DocumentsController@download');
 Route::get('documents/open/{id}','DocumentsController@open');
 Route::get('mydocuments','DocumentsController@mydocuments');
@@ -52,10 +54,10 @@ Route::get('/trash','DocumentsController@trash');
 Route::get('documents/restore/{id}','DocumentsController@restore');
 Route::post('documents/show/{id}','DocumentsController@assignToUser')->name('document.user');
 Route::post('documents/{id}','DocumentsController@assignToDepartment')->name('document.department');
-Route::get('documents/show/remove/{id}','DocumentsController@removeUser')->name('document.devolver');
-Route::get('documents/show/{id}','DocumentsController@takeDocument')->name('document.take');
-Route::get('documents/delete/{id}', 'DocumentsController@smsNotifyPage')->name('document.sms');
-Route::delete('destroy/{id}', 'DocumentsController@destroy')->name('document.destroy');
+Route::post('documents/remove/{id}','DocumentsController@removeUser')->name('document.devolver');
+Route::post('documents/take/{id}','DocumentsController@takeDocument')->name('document.take');
+
+
 Route::delete('documentsDeleteMulti','DocumentsController@deleteMulti');
 // search
 Route::post('/search','DocumentsController@search');

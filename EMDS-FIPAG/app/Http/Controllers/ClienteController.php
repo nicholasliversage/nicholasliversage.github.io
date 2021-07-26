@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Category;
 use App\Document;
 use App\Cliente;
+use App\Message;
 use Illuminate\Support\Facades\Storage;
 use DB;
 use Mail;
@@ -45,11 +46,10 @@ class ClienteController extends Controller
          $cliente->save();
          
           
-  
+
           $doc = new Document;
           $doc->description = $request->input('description');
           $doc->cliente_name = $request->input('name');
-          $doc->cliente_id = $cliente->id;
         //  $doc->user_id = $user_id;
         //  $doc->department_id = $department_id;
         // handle file upload
@@ -89,23 +89,29 @@ class ClienteController extends Controller
            // add Category
           $doc->category_id = $request->input('category');
           $doc->save();
-         
+
           $cat = Category::where('id','=',$request->input('category'))->first();
+
+          $message = new Message();
+          $message->body = "Enviou uma nova carta";
+          $message->description = $cat->name;
+          $message->cliente_id = $cliente->id;
+          $message->doc_id = $doc->id;
+          $message->save();
+         
+          
          //  Send mail to admin
-        \Mail::send('inc.mail', array(
+        /*\Mail::send('inc.mail', array(
           'name' => $request->get('name'),
           'email' => $request->get('email'),
           'phone' => $request->get('phone'),
           'subject' => $cat->name,
-          'user_query' => $request->get('description')
+          'user_query' => $request->get('description'),
       ), function($message) use ($request){
-          $message->from($request->get('email'));
-          $message->to('vergil99966@gmail.com', 'FIPAG')->subject($request->input('category'));
-      });
-          //$doc->categories()->sync($request->category_id);
-  
-          \Log::addToLog('Nova Carta, O cliente '.$request->get('name').' enviou uma nova carta',
-        $cliente->name,$cliente->id);
+          $message->from('nicolasliversage@gmail.com');
+          $message->to('vergil99966@gmail.com', 'FIPAG')->subject($request->get('category'));
+      });*/
+          \Log::addToLog('New Document, '.$request->input('name').' was uploaded');
   
           return redirect('/cliente')->with('success','A sua carta foi enviada');
       }
